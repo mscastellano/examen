@@ -1,0 +1,66 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: mishell
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: examenu1-castellanomishell
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action: 
+        - dynamodb:*
+      Resource: 
+        - arn:aws:dynamodb:us-east-1:160885290085:table/BooksNew
+    
+functions:
+  hello:
+    handler: src/handler.hello
+    events:
+      - httpApi:
+          path: /  
+          method: get
+          
+  addBook:
+    handler: src/addBook.addBook  
+    events:
+      - httpApi:
+          path: /books  
+          method: post
+
+  getBook:
+    handler: src/getBook.getBooks  
+    events:
+      - httpApi:
+          path: /books  
+          method: get
+
+  updateBook:
+    handler: src/updateBook.updateBook  
+    events:
+      - httpApi:
+          path: /books/{BookID}  
+          method: put
+
+  deleteBook:
+    handler: src/deleteBook.deleteBook  
+    events:
+      - httpApi:
+          path: /books/{BookID}  
+          method: delete
+
+resources:
+  Resources:
+    BooksNew:  # Corregido aquí
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: BooksNew
+        AttributeDefinitions:
+          - AttributeName: BookID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: BookID
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
